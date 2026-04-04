@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request){
-        $validated = $request->validate();
+        $validated = $request->validated();
         $validated['password'] = Hash::make($request->password);
         if($request->hasFile('avatar')){
             $path = $request->file('avatar')->stor('avatars','public');
             $validated['avatar']=$path;
         }
         $user = User::create($validated);
+        $user->assignRole('user');
         return response()->json($user, 201);
     }
 
