@@ -14,7 +14,6 @@ class WalletController extends Controller
         $user_id = Auth::id();
         $validatedData = $request->validated();
         $validatedData['user_id'] = $user_id;
-
         $wallet = Wallet::create($validatedData);
 
         return response()->json([
@@ -35,12 +34,9 @@ class WalletController extends Controller
     }
 
     public function get_one_wallet($id){
-        $user_id = Auth::id();
-        $wallet = Wallet::where('user_id',$user_id)->find($id);
-        if($wallet == null){
-            return response()->json([
-                'message' => 'Wallet not found'
-            ], 404);
+        $wallet = Wallet::where('user_id',Auth::id())->find($id);
+        if($wallet === null){
+            return response()->json('Wallet not found', 404);
         }
 
         return response()->json([
@@ -49,18 +45,15 @@ class WalletController extends Controller
     }
 
     public function update_wallet(Request $request, $id){
-        $user_id = Auth::id();
         $validatedData = $request->validate([
             'name'  => 'sometimes|string|max:50'
         ]);
-        $wallet = Wallet::where('user_id',$user_id)->find($id);
+        $wallet = Wallet::where('user_id',Auth::id())->find($id);
         if($wallet === null){
-            return response()->json([
-                'message' => 'Wallet not found'
-            ], 404);
+            return response()->json('Wallet not found', 404);
         }
-
         $wallet->update($validatedData);
+
         return response()->json([
             'message'   => 'wallet updated successfully',
             'wallet'    => $wallet
@@ -68,14 +61,10 @@ class WalletController extends Controller
     }
 
     public function delete_wallet($id){
-        $user_id = Auth::id();
-        $wallet = Wallet::where('user_id',$user_id)->find($id);
+        $wallet = Wallet::where('user_id',Auth::id())->find($id);
         if($wallet === null){
-            return response()->json([
-                'message' => 'Wallet not found'
-            ], 404);
+            return response()->json('Wallet not found', 404);
         }
-
         $wallet->delete();
 
         return response()->json(null, 204);
