@@ -6,7 +6,7 @@ use App\Http\Requests\WalletRequest;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 
 class WalletController extends Controller
 {
@@ -15,6 +15,10 @@ class WalletController extends Controller
         $validatedData = $request->validated();
         $validatedData['user_id'] = $user_id;
         $wallet = Wallet::create($validatedData);
+
+        Log::info('Wallet created', [
+            'user_id' => $user_id, 'wallet_id' => $wallet->id
+        ]);
 
         return response()->json([
             'message'   => 'wallet created successfully',
@@ -65,6 +69,11 @@ class WalletController extends Controller
         if($wallet === null){
             return response()->json('Wallet not found', 404);
         }
+
+        Log::warning('Wallet deleted', [
+            'user_id' => Auth::id(), 'wallet_id' => $wallet->id
+        ]);
+
         $wallet->delete();
 
         return response()->json(null, 204);

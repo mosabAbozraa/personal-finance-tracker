@@ -6,6 +6,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -14,6 +15,10 @@ class CategoryController extends Controller
         $validateData = $request->validated();
         $validateData['user_id'] = $user_id;
         $category = Category::create($validateData);
+
+        Log::info('Category created', [
+            'user_id' => $user_id, 'category_id' => $category->id
+        ]);
 
         return response()->json([
             'message'  => 'category created successfully',
@@ -64,6 +69,11 @@ class CategoryController extends Controller
         if($category === null){
             return response()->json('Category not found', 404);
         }
+
+        Log::warning('Category deleted', [
+            'user_id' => Auth::id(), 'category_id' => $category->id
+        ]);
+
         $category->delete();
 
         return response()->json(null, 204);
