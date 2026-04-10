@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('date');
             $table->enum('type', ['income','expence']);
             $table->text('notes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
