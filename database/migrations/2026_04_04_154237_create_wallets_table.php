@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('balance', 10, 2)->default(0);
             $table->enum('currency' , ['SYP','USD','EUR']);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->decimal('amount', 10, 2);
             $table->date('date');
-            $table->enum('type', ['income','expence']);
+            $table->enum('type', ['income','expense']);
             $table->text('notes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

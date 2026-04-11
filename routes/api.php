@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,7 +12,7 @@ Route::middleware(['auth:sanctum','role:admin'])->group(function(){
 
 Route::middleware('auth:sanctum')->group(function(){
 
-    //************************************ Wallets ***************************************
+//************************************ Wallets ******************************************
     Route::prefix('wallet')->group(function(){
         Route::post('/add', [WalletController::class, 'add_wallet']);
         Route::get('/getAll', [WalletController::class, 'get_wallets']);
@@ -20,14 +21,20 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::delete('/delete/{id}', [WalletController::class, 'delete_wallet']);
     });
 
-    //************************************ Categories ***************************************
-    Route::prefix('category')->group(function(){
-        Route::post('/add', [CategoryController::class, 'add_category']);
-        Route::get('/getAll', [CategoryController::class, 'get_categories']);
-        Route::get('/getOne/{id}', [CategoryController::class, 'get_one_category']);
-        Route::put('/update/{id}', [CategoryController::class, 'update_category']);
-        Route::delete('/delete/{id}', [CategoryController::class, 'delete_category']);
+//************************************ Categories ****************************************
+    Route::prefix('category/')->group(function(){
+        Route::post('add', [CategoryController::class, 'add_category']);
+        Route::get('getAll', [CategoryController::class, 'get_categories']);
+        Route::get('getOne/{id}', [CategoryController::class, 'get_one_category']);
+        Route::put('update/{id}', [CategoryController::class, 'update_category']);
+        Route::delete('delete/{id}', [CategoryController::class, 'delete_category']);
     });
+
+//************************************ Transactions ***************************************
+    Route::prefix('transaction/')->group(function(){
+        Route::post('create',[TransactionController::class,'create_transation']);
+    });
+
 });
 
 Route::prefix('Auth')->group(function(){
