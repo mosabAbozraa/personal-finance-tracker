@@ -10,15 +10,20 @@ Route::middleware(['auth:sanctum','role:admin'])->group(function(){
 
 });
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::prefix('Auth/')->group(function(){
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
 
+Route::middleware('auth:sanctum')->group(function(){
 //************************************ Wallets ******************************************
-    Route::prefix('wallet')->group(function(){
-        Route::post('/add', [WalletController::class, 'add_wallet']);
-        Route::get('/getAll', [WalletController::class, 'get_wallets']);
-        Route::get('/getOne/{id}', [WalletController::class, 'get_one_wallet']);
-        Route::put('/update/{id}', [WalletController::class, 'update_wallet']);
-        Route::delete('/delete/{id}', [WalletController::class, 'delete_wallet']);
+    Route::prefix('wallet/')->group(function(){
+        Route::post('add', [WalletController::class, 'add_wallet']);
+        Route::get('getAll', [WalletController::class, 'get_wallets']);
+        Route::get('getOne/{id}', [WalletController::class, 'get_one_wallet']);
+        Route::put('update/{id}', [WalletController::class, 'update_wallet']);
+        Route::delete('delete/{id}', [WalletController::class, 'delete_wallet']);
     });
 
 //************************************ Categories ****************************************
@@ -32,13 +37,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
 //************************************ Transactions ***************************************
     Route::prefix('transaction/')->group(function(){
-        Route::post('create',[TransactionController::class,'create_transation']);
+        Route::post('create',[TransactionController::class,'create_transaction']);
+        Route::patch('update/{id}',[TransactionController::class,'update_transaction']);
+        Route::delete('delete/{id}',[TransactionController::class, 'delete_transaction']);
     });
 
-});
-
-Route::prefix('Auth')->group(function(){
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
 });
