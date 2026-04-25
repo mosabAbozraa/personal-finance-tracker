@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Category;
+use App\Models\ExchangeRate;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use App\Services\CurrencyService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -31,6 +33,7 @@ class TransactionController extends Controller
         $validatedData['wallet_id'] = $wallet->id;
         $validatedData['category_id'] = $category->id;
         $validatedData['date'] = $validatedData['date'] ?? now()->toDateString();
+        $validatedData['amount'] = app(CurrencyService::class)->convert($validatedData['amount'],$validatedData['currency'],$wallet->currency);
 
         $transaction = Transaction::create($validatedData);
         $transaction->wallet->refresh();
