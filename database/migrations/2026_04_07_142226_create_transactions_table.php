@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->date('date');
             $table->enum('type', ['income','expense']);
+            $table->enum('currency' , ['SYP','USD','EUR']);
             $table->text('notes')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -27,6 +27,7 @@ class CreateTransactionRequest extends FormRequest
             'category_id'   => 'required|exists:categories,id',
             'amount'        => 'required|numeric|min:0.01',
             'type'          => 'required|in:income,expense',
+            'currency'      => 'required|in:SYP,USD,EUR',
             'date'          => 'sometimes|date',
             'notes'         => 'nullable|string|max:200'
         ];
