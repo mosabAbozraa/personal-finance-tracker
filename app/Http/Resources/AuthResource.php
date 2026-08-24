@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Symfony\Component\CssSelector\Parser\Token;
 
-class LoginResource extends JsonResource
+class AuthResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +15,8 @@ class LoginResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'First name'    => $this->first_name,
-            'Last name'     => $this->last_name,
-            'Email address' => $this->email,
-            'Avatar'        => $this->avatar,
+            'token' => $this['token'],
+            'user data' => new LoginResource($this['user'])
         ];
     }
 }
