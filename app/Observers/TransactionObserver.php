@@ -2,8 +2,12 @@
 
 namespace App\Observers;
 
+use App\Events\BudgetExceeded;
+use App\Models\Budget;
+use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use Illuminate\Support\Facades\Log;
 
 class TransactionObserver
 {
@@ -18,6 +22,29 @@ class TransactionObserver
         else{
             $transaction->wallet->decrement('balance', $transaction->amount);
         }
+
+        if ($transaction->type === 'income') return;
+
+        $budget = Budget::where('category_id', $transaction->category_id)->first();
+        if (!$budget) return;
+
+        $startDate = $budget->period === 'monthly'
+            ? now()->startOfMonth()
+            : now()->startOfWeek();
+
+        $endDate = $budget->period === 'monthly'
+            ? now()->endOfMonth()
+            : now()->endOfWeek();
+
+        $totalSpent = Transaction::where('category_id', $transaction->category_id)
+            ->where('type', 'expense')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+
+        if ($totalSpent > $budget->limit_amount) {
+            event(new BudgetExceeded($transaction, $budget, $totalSpent));
+        }
+
     }
 
     /**

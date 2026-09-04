@@ -18,4 +18,8 @@ class Category extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
+
+    public function budget(){
+        return $this->hasOne(Budget::class);
+    }
 }
