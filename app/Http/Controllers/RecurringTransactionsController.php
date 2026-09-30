@@ -25,11 +25,12 @@ class RecurringTransactionsController extends Controller
 
     public function show($id){
         $user = Auth::user();
-        $recurringTransactions = RecurringTransaction::where('user_id', $user->id)->find($id);
+        $recurringTransactions = RecurringTransaction::find($id);
 
         if (!$recurringTransactions) {
             return response()->json(['message' => 'Recurring transaction not found'], 404);
         }
+        $this->authorize('view', $recurringTransactions);
 
         return response()->json([
             'message' => 'Recurring transactions retrieved successfully',
