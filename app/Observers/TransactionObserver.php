@@ -7,13 +7,17 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use App\Services\BudgetExceedService;
 use Illuminate\Support\Facades\Log;
 
 class TransactionObserver
 {
-    /**
-     * Handle the Transaction "created" event.
-     */
+    protected BudgetExceedService $budgetExceedService;
+
+    public function __construct(BudgetExceedService $budgetExceedService){
+        $this->budgetExceedService = $budgetExceedService;
+    }
+
     public function created(Transaction $transaction): void
     {
         if($transaction->type === 'income'){
@@ -28,18 +32,7 @@ class TransactionObserver
         $budget = Budget::where('category_id', $transaction->category_id)->first();
         if (!$budget) return;
 
-        $startDate = $budget->period === 'monthly'
-            ? now()->startOfMonth()
-            : now()->startOfWeek();
-
-        $endDate = $budget->period === 'monthly'
-            ? now()->endOfMonth()
-            : now()->endOfWeek();
-
-        $totalSpent = Transaction::where('category_id', $transaction->category_id)
-            ->where('type', 'expense')
-            ->whereBetween('date', [$startDate, $endDate])
-            ->sum('amount');
+        $totalSpent = $this->budgetExceedService->checkBudgetExceed($budget, $transaction);
 
         if ($totalSpent > $budget->limit_amount) {
             event(new BudgetExceeded($transaction, $budget, $totalSpent));
