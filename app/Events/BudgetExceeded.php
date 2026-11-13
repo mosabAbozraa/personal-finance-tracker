@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class BudgetExceeded
+class BudgetExceeded implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -25,7 +25,17 @@ class BudgetExceeded
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('App.Models.User'.$this->budget->user_id),
+        ];
+    }
+
+    public function broadcastWith(){
+        return [
+            'budget_id'    => $this->budget->id,
+            'category'     => $this->budget->category->name,
+            'limit_amount' => $this->budget->limit_amount,
+            'total_spent'  => $this->totalSpent,
+            'period'       => $this->budget->period,
         ];
     }
 }
