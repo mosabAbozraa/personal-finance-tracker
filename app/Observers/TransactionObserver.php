@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Events\BudgetExceeded;
+use App\Events\LowBalanceAlert;
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -18,31 +19,36 @@ class TransactionObserver
         $this->budgetExceedService = $budgetExceedService;
     }
 
+    private function checkLowBalance(Wallet $wallet){
+        $wallet->refresh();
+        if ($wallet->low_balance_threshold !== null 
+        && $wallet->balance <= $wallet->low_balance_threshold){
+            event(new LowBalanceAlert($wallet));
+        }
+    }
+
     public function created(Transaction $transaction): void
     {
-        if($transaction->type === 'income'){
-            $transaction->wallet->increment('balance', $transaction->amount);
-        }
-        else{
-            $transaction->wallet->decrement('balance', $transaction->amount);
+        $wallet = $transaction->wallet;
+
+        if ($transaction->type === 'income') {
+            $wallet->increment('balance', $transaction->amount);
+            return;
         }
 
-        if ($transaction->type === 'income') return;
+        $wallet->decrement('balance', $transaction->amount);
+        $this->checkLowBalance($wallet);
 
         $budget = Budget::where('category_id', $transaction->category_id)->first();
         if (!$budget) return;
 
         $totalSpent = $this->budgetExceedService->checkBudgetExceed($budget, $transaction);
-
         if ($totalSpent > $budget->limit_amount) {
             event(new BudgetExceeded($transaction, $budget, $totalSpent));
         }
-
     }
 
-    /**
-     * Handle the Transaction "updated" event.
-     */
+
     public function updated(Transaction $transaction): void
     {
         // dd([
@@ -79,11 +85,13 @@ class TransactionObserver
         else{
             $newWallet->decrement('balance', $newAmount);
         }
+        $this->checkLowBalance($newWallet);
+        if ($oldWalletId !== $newWalletId) {
+            $this->checkLowBalance($oldWallet);
+        }
     }
 
-    /**
-     * Handle the Transaction "deleted" event.
-     */
+
     public function deleted(Transaction $transaction): void
     {
         if($transaction->type === 'expense'){
@@ -92,6 +100,10 @@ class TransactionObserver
         else{
             $transaction->wallet->decrement('balance', $transaction->amount);
         }
+                
+        $transaction->wallet->refresh();
+        $this->checkLowBalance($transaction->wallet);
+
     }
 
     /**
