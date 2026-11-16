@@ -18,4 +18,8 @@ class Transaction extends Model
     public function category() {
         return $this->belongsTo(Category::class);
     }
+
+    public function notifications(){
+        return $this->morphMany(Notification::class, 'notifiable');
+    }    
 }

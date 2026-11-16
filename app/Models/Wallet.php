@@ -18,4 +18,8 @@ class Wallet extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
+
+    public function notifications(){
+        return $this->morphMany(Notification::class, 'notifiable');
+    }    
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\RecurringTransactionsController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum','role:admin'])->group(function(){
@@ -67,7 +66,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::patch('update/{budgetId}', 'updateBudget');
         Route::delete('delete/{budgetId}', 'removeBudget');
     });
-
+    
+//**************************************** Recurring Transactions*****************************************
     Route::controller(RecurringTransactionsController::class)->prefix('recurring')->group(function(){
         Route::get('getAll', 'index');
         Route::get('getOne/{id}', 'show');
