@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Override;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -42,5 +43,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function budgets(){
         return $this->hasMany(Budget::class);
+    }
+
+    public function notifications(){
+        return $this->hasMany(Notification::class);
     }
 }
